@@ -1,0 +1,120 @@
+Subject: [PATCH] adapt modify in uos
+---
+Index: Makefile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Makefile b/Makefile
+--- a/Makefile	(revision 96a320f812f79e928894e93dada536b442a32d32)
++++ b/Makefile	(revision 5c704be8efe91907845a04200c718b3b2f8e7370)
+@@ -18,15 +18,15 @@
+ endif
+ 
+ # you should config right path according to your run-time environment
+-KPATH := /usr/src/kernels
+-KDIR  := $(KPATH)/$(shell ls $(KPATH))
++KPATH := /usr/src
++KDIR  := $(KPATH)/$(shell dpkg -l | grep linux-headers | awk '{print $$2}' | head -n 1)
+ 
+-EXTRA_CFLAGS += -fstack-protector-strong -DCONFIG_TEELOG -DCONFIG_TZDRIVER_MODULE -DCONFIG_TEECD_AUTH -DCONFIG_PAGES_MEM=y -DCONFIG_CLOUDSERVER_TEECD_AUTH
++EXTRA_CFLAGS += -DCONFIG_TEELOG -DCONFIG_TZDRIVER_MODULE -DCONFIG_TEECD_AUTH -DCONFIG_PAGES_MEM=y -DCONFIG_CLOUDSERVER_TEECD_AUTH
+ EXTRA_CFLAGS += -I$(PWD)/libboundscheck/include/ -I$(PWD) -I$(PWD)/auth -I$(PWD)/core -I$(PWD)/tzdriver_internal/tee_trace_event
+ EXTRA_CFLAGS += -I$(PWD)/tlogger -I$(PWD)/tzdriver_internal/kthread_affinity -I$(PWD)/tzdriver_internal/include
+ EXTRA_CFLAGS += -DCONFIG_CPU_AFF_NR=0 -DCONFIG_BIG_SESSION=1000 -DCONFIG_NOTIFY_PAGE_ORDER=4 -DCONFIG_512K_LOG_PAGES_MEM -DCONFIG_TEE_TRACE
+ EXTRA_CFLAGS += -DCONFIG_TEE_LOG_ACHIVE_PATH=\"/var/log/tee/last_teemsg\"
+-EXTRA_CFLAGS += -DNOT_TRIGGER_AP_RESET -DLAST_TEE_MSG_ROOT_GID -DCONFIG_NOCOPY_SHAREDMEM
++EXTRA_CFLAGS += -DNOT_TRIGGER_AP_RESET -DLAST_TEE_MSG_ROOT_GID -DCONFIG_NOCOPY_SHAREDMEM -DUOS=1
+ EXTRA_CFLAGS += -DTEECD_PATH_UID_AUTH_CTX=\"/usr/bin/teecd:0\"
+ EXTRA_CFLAGS += -DCONFIG_AUTH_SUPPORT_UNAME -DCONFIG_AUTH_HASH -std=gnu99
+ all:
+Index: README.en.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.en.md b/README.en.md
+--- a/README.en.md	(revision 96a320f812f79e928894e93dada536b442a32d32)
++++ b/README.en.md	(revision 5c704be8efe91907845a04200c718b3b2f8e7370)
+@@ -28,6 +28,7 @@
+ 2) # insmod tzdriver.ko
+ 3) # /usr/bin/teecd &
+ 4) run any CA
++5) If you want to detele tzdriver after installing it, you need to reboot the server.
+ 
+ 5.License
+ please see License/Tzdriver_License for more details
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision 96a320f812f79e928894e93dada536b442a32d32)
++++ b/README.md	(revision 5c704be8efe91907845a04200c718b3b2f8e7370)
+@@ -25,3 +25,4 @@
+    2）使用root用户，执行insmod tzdriver.ko
+    3）使用root用户，执行/usr/bin/teecd&
+    4）运行测试CA 和TA
++   5）如果要卸载tzdriver，需要重启服务器才可生效
+Index: core/gp_ops.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/core/gp_ops.c b/core/gp_ops.c
+--- a/core/gp_ops.c	(revision 96a320f812f79e928894e93dada536b442a32d32)
++++ b/core/gp_ops.c	(revision 5c704be8efe91907845a04200c718b3b2f8e7370)
+@@ -159,7 +159,7 @@
+ 		((uint64_t)client_param->memref.buffer_h_addr << ADDR_TRANS_NUM);
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) || \
+-	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
++	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71) || UOS == 1)
+ 	if (access_ok(VERIFY_READ, (void *)(uintptr_t)size_addr, sizeof(uint32_t)) == 0)
+ #else
+ 	if (access_ok((void *)(uintptr_t)size_addr, sizeof(uint32_t)) == 0)
+@@ -169,7 +169,7 @@
+ 	get_user(size, (uint32_t *)(uintptr_t)size_addr);
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) || \
+-	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
++	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71) || UOS == 1)
+ 	if (access_ok(VERIFY_READ, (void *)(uintptr_t)buffer_addr, size) == 0)
+ #else
+ 	if (access_ok((void *)(uintptr_t)buffer_addr, size) == 0)
+@@ -187,7 +187,7 @@
+ 		((uint64_t)client_param->value.b_h_addr << ADDR_TRANS_NUM);
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) || \
+-	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
++	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71) || UOS == 1)
+ 	if (access_ok(VERIFY_READ, (void *)(uintptr_t)a_addr, sizeof(uint32_t)) == 0)
+ #else
+ 	if (access_ok((void *)(uintptr_t)a_addr, sizeof(uint32_t)) == 0)
+@@ -195,7 +195,7 @@
+ 		return false;
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) || \
+-	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
++	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71) || UOS == 1)
+ 	if (access_ok(VERIFY_READ, (void *)(uintptr_t)b_addr, sizeof(uint32_t)) == 0)
+ #else
+ 	if (access_ok((void *)(uintptr_t)b_addr, sizeof(uint32_t)) == 0)
+Index: tlogger/tlogger.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tlogger/tlogger.c b/tlogger/tlogger.c
+--- a/tlogger/tlogger.c	(revision 96a320f812f79e928894e93dada536b442a32d32)
++++ b/tlogger/tlogger.c	(revision 5c704be8efe91907845a04200c718b3b2f8e7370)
+@@ -645,7 +645,7 @@
+ static int check_user_arg(unsigned long arg, size_t arg_len)
+ {
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) || \
+-	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
++	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71) || UOS == 1)
+ 	return (int)access_ok(VERIFY_READ,
+ 		(void __user *)(uintptr_t)arg, arg_len);
+ #else

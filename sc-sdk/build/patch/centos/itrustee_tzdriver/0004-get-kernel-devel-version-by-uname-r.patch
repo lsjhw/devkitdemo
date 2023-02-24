@@ -1,17 +1,14 @@
-From 1e55adbe4b5bb1b858778567a01a05751e877084 Mon Sep 17 00:00:00 2001
-From: huangyongtao1 <hyt3161@163.com>
-Date: Sat, 22 Oct 2022 10:37:25 +0800
 Subject: [PATCH] get kernel devel version by uname -r
-
 ---
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
+Index: Makefile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
 diff --git a/Makefile b/Makefile
-index 2fc9fea..4df0128 100644
---- a/Makefile
-+++ b/Makefile
-@@ -18,7 +18,7 @@ endif
+--- a/Makefile	(revision 3600bb022b22c32a10474aa8693c60bb7f326fb5)
++++ b/Makefile	(revision f682cd55fe571e6b7382291eced791a60c49c4d3)
+@@ -19,7 +19,7 @@
  
  # you should config right path according to your run-time environment
  KPATH := /usr/src/kernels
@@ -20,7 +17,7 @@ index 2fc9fea..4df0128 100644
  KDIR  := $(KPATH)/$(KERNEL_VERSION)
  
  GCC_VERSION := $(shell expr `gcc -dumpversion | cut -f1 -d.`)
-@@ -30,7 +30,7 @@ KERNEL_VERSION_LIST := 4.18.0-305.10.2.el7.aarch64 4.18.0-348.20.1.el7.aarch64
+@@ -31,7 +31,7 @@
  KERNEL_MATCH := $(findstring $(KERNEL_VERSION), $(KERNEL_VERSION_LIST))
  
  ifeq ("$(GCC_VERSION)_$(KERNEL_VERSION)", "$(GCC_MATCH)_$(KERNEL_MATCH)")
@@ -29,6 +26,3 @@ index 2fc9fea..4df0128 100644
  endif
  
  EXTRA_CFLAGS += -fstack-protector-strong -DCONFIG_TEELOG -DCONFIG_TZDRIVER_MODULE -DCONFIG_TEECD_AUTH -DCONFIG_PAGES_MEM=y -DCONFIG_AUTH_ENHANCE -DCONFIG_CLOUDSERVER_TEECD_AUTH
--- 
-2.36.1.windows.1
-

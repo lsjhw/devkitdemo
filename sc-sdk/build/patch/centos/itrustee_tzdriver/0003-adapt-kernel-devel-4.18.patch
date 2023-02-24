@@ -1,20 +1,14 @@
-From 199ac926dfcbf80203a85568332b1ea1023248c9 Mon Sep 17 00:00:00 2001
-From: huangyongtao1 <hyt3161@163.com>
-Date: Tue, 13 Sep 2022 11:25:39 +0800
 Subject: [PATCH] adapt kernel devel 4.18
-
 ---
- ...nd-kernel-version-matching-judgement.patch | 125 ++++++++++++++++++
- core/gp_ops.c                                 |  12 +-
- tlogger/tlogger.c                             |   3 +-
- 3 files changed, 135 insertions(+), 5 deletions(-)
- create mode 100644 0002-add-gcc-and-kernel-version-matching-judgement.patch
-
+Index: 0002-add-gcc-and-kernel-version-matching-judgement.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
 diff --git a/0002-add-gcc-and-kernel-version-matching-judgement.patch b/0002-add-gcc-and-kernel-version-matching-judgement.patch
 new file mode 100644
-index 0000000..109f8d2
---- /dev/null
-+++ b/0002-add-gcc-and-kernel-version-matching-judgement.patch
+--- /dev/null	(revision 3600bb022b22c32a10474aa8693c60bb7f326fb5)
++++ b/0002-add-gcc-and-kernel-version-matching-judgement.patch	(revision 3600bb022b22c32a10474aa8693c60bb7f326fb5)
 @@ -0,0 +1,125 @@
 +From b0fbae89a6667d050a4301601035cf1aa76f6571 Mon Sep 17 00:00:00 2001
 +From: huangyongtao1 <hyt3161@163.com>
@@ -141,41 +135,45 @@ index 0000000..109f8d2
 +-- 
 +2.36.1.windows.1
 +
+Index: core/gp_ops.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
 diff --git a/core/gp_ops.c b/core/gp_ops.c
-index f73aca0..d2e3467 100644
---- a/core/gp_ops.c
-+++ b/core/gp_ops.c
-@@ -159,7 +159,8 @@ static bool is_usr_refmem_valid(union tc_ns_client_param *client_param)
- {
- 	uint32_t size = 0;
+--- a/core/gp_ops.c	(revision fc7296ea560cb432146b0c80daa8ae0db4457692)
++++ b/core/gp_ops.c	(revision 3600bb022b22c32a10474aa8693c60bb7f326fb5)
+@@ -158,7 +158,8 @@
+ 	uint64_t buffer_addr = client_param->memref.buffer |
+ 		((uint64_t)client_param->memref.buffer_h_addr << ADDR_TRANS_NUM);
  
 -#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) || \
 +#if ((LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) && \
 +    LINUX_VERSION_CODE != KERNEL_VERSION(4, 18, 0)) || \
  	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
- 	if (!access_ok(VERIFY_READ,
- 		(void *)(uintptr_t)client_param->memref.size_addr,
-@@ -173,7 +174,8 @@ static bool is_usr_refmem_valid(union tc_ns_client_param *client_param)
+ 	if (access_ok(VERIFY_READ, (void *)(uintptr_t)size_addr, sizeof(uint32_t)) == 0)
+ #else
+@@ -168,7 +169,8 @@
  
- 	get_user(size, (uint32_t *)(uintptr_t)client_param->memref.size_addr);
+ 	get_user(size, (uint32_t *)(uintptr_t)size_addr);
  
 -#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) || \
 +#if ((LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) && \
 +    LINUX_VERSION_CODE != KERNEL_VERSION(4, 18, 0)) || \
  	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
- 	if (!access_ok(VERIFY_READ,
- 		(void *)(uintptr_t)client_param->memref.buffer, size))
-@@ -187,7 +189,8 @@ static bool is_usr_refmem_valid(union tc_ns_client_param *client_param)
+ 	if (access_ok(VERIFY_READ, (void *)(uintptr_t)buffer_addr, size) == 0)
+ #else
+@@ -186,7 +188,8 @@
+ 	uint64_t b_addr = client_param->value.b_addr |
+ 		((uint64_t)client_param->value.b_h_addr << ADDR_TRANS_NUM);
  
- static bool is_usr_valmem_valid(union tc_ns_client_param *client_param)
- {
 -#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) || \
 +#if ((LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) && \
 +    LINUX_VERSION_CODE != KERNEL_VERSION(4, 18, 0)) || \
  	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
- 	if (!access_ok(VERIFY_READ,
- 		(void *)(uintptr_t)client_param->value.a_addr,
-@@ -199,7 +202,8 @@ static bool is_usr_valmem_valid(union tc_ns_client_param *client_param)
+ 	if (access_ok(VERIFY_READ, (void *)(uintptr_t)a_addr, sizeof(uint32_t)) == 0)
+ #else
+@@ -194,7 +197,8 @@
  #endif
  		return false;
  
@@ -183,13 +181,17 @@ index f73aca0..d2e3467 100644
 +#if ((LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 18) && \
 +    LINUX_VERSION_CODE != KERNEL_VERSION(4, 18, 0)) || \
  	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
- 	if (!access_ok(VERIFY_READ,
- 		(void *)(uintptr_t)client_param->value.b_addr,
+ 	if (access_ok(VERIFY_READ, (void *)(uintptr_t)b_addr, sizeof(uint32_t)) == 0)
+ #else
+Index: tlogger/tlogger.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
 diff --git a/tlogger/tlogger.c b/tlogger/tlogger.c
-index 436ad05..dac09c2 100644
---- a/tlogger/tlogger.c
-+++ b/tlogger/tlogger.c
-@@ -651,7 +651,8 @@ static int get_tlogcat_f_stat(void)
+--- a/tlogger/tlogger.c	(revision fc7296ea560cb432146b0c80daa8ae0db4457692)
++++ b/tlogger/tlogger.c	(revision 3600bb022b22c32a10474aa8693c60bb7f326fb5)
+@@ -644,7 +644,8 @@
  
  static int check_user_arg(unsigned long arg, size_t arg_len)
  {
@@ -199,6 +201,3 @@ index 436ad05..dac09c2 100644
  	LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 71))
  	return (int)access_ok(VERIFY_READ,
  		(void __user *)(uintptr_t)arg, arg_len);
--- 
-2.36.1.windows.1
-
