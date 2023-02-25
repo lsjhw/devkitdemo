@@ -15,7 +15,7 @@ new file mode 100644
 +TARGET_APP := libteec_adaptor.so.1
 +SO_NAME := libteec_adaptor.so
 +
-+APP_SOURCES += $(iTrustee_SDK_PATH)/src/CA/cloud/libteec_adaptor.c
++APP_SOURCES += $(iTrustee_SDK_PATH)/src/CA/libteec_adaptor.c
 +APP_CFLAGS += -fstack-protector-strong -fPIC -ftrapv -s -D_FORTIFY_SOURCE=2 -O2
 +APP_CFLAGS += -I$(iTrustee_SDK_PATH)/include/CA -I$(iTrustee_SDK_PATH)/thirdparty/open_source/libboundscheck/include
 +
