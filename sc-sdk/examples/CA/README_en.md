@@ -8,9 +8,9 @@ The **CA demo** shows examples on the insecure side. Run the CA demo together wi
 
 ## Dependencies
 
-1. Ensure that kunpeng-sc-devel has been installed.
-2. Run the **lsmod | grep tzdriver** command to ensure that the tzdriver is properly loaded.
-3. Run the **ps -ef | grep teecd** command to ensure that the daemon process is started properly.
+1. Ensure that `kunpeng-sc-1.3.0` and `kunpeng-sc-devel-1.3.0` of the same version have been installed in the environment. Download the [Confidential Computing SDK](https://mirrors.huaweicloud.com/kunpeng/archive/Kunpeng_SDK/itrustee/).
+2. Run the `lsmod | grep tzdriver` command to check whether the tzdriver is properly loaded.
+3. Run the  `ps -ef | grep teecd` command to check whether the daemon is started properly.
 
 ## Guidance
 
