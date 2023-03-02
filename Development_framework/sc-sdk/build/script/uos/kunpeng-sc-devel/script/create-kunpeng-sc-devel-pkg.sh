@@ -37,7 +37,7 @@ UsrInc="${BuildRoot}/usr/include"
 
 AppHome="${BuildRoot}/usr/local/${AppName}"
 AppInc="${UsrInc}/itrustee_sdk"
-AppDemo="${AppHome}/example"
+AppDemo="${AppHome}/examples"
 AppUtil="${AppHome}/utils"
 AppSrc="${AppHome}/source"
 
@@ -87,6 +87,7 @@ function install_software(){
     # install utils
     cp -r ${BldSdk}/build/signtools ${AppUtil}
     cp -r ${BldSdk}/build/tools ${AppUtil}
+    cp -r ${BldSdk}/build/pack-Config/ ${AppUtil}
 
     # install include
     cp -r ${BldSdk}/include/* ${AppInc}
@@ -112,7 +113,7 @@ function install_software(){
 
 function create_pkg(){
     cd ${ScriptPath}
-    dpkg-deb -b ../buildroot kunpeng-sc-devel_1.1.0_arm64.deb
+    dpkg-deb -b ../buildroot kunpeng-sc-devel_1.3.0_arm64.deb
 }
 
 function clean(){
