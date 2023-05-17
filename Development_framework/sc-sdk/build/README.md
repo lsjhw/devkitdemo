@@ -1,7 +1,7 @@
 # **kunpeng sc sdk 构建说明**
 
 ## 介绍
-本目录主要用于自动化构建kunpeng sc 发布包使用，目前支持在CentOS7.6, openEuler20.03 SP1, UOS 20 SP1 3个系统上进行发布包构建
+本目录主要用于自动化构建kunpeng sc 发布包使用，目前支持在openEuler20.03 SP1, openEuler 22.03 SP1, UOS 20 1050e个系统上进行发布包构建
 
 ## 目录说明
 - patch: 主要存放对集成的sc SDK的适配修改

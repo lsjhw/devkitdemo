@@ -22,7 +22,7 @@ PatchPath=${RootPath}/patch
 ScriptPath=${RootPath}/script
 SrcPath=${RootPath}/src
 OutputPath=${RootPath}/output
-PackageVersion="1.3.0"
+PackageVersion="2.0.0"
 
 # workdir
 DebBuild="/root/debbuild"
@@ -150,7 +150,7 @@ function get_src_code() {
         exit 1
     fi
 
-    git clone -b devkitdemo-23.0.0 https://github.com/kunpengcompute/devkitdemo.git
+    git clone -b devkitdemo-23.0.1 https://github.com/kunpengcompute/devkitdemo.git
     if [[ $? -ne 0 ]]; then
         echo "devkitdemo download failed."
         rm -rf ${SrcPath}

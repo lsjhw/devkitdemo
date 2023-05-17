@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 
 Name:           kunpeng-sc
-Version:        1.3.0
+Version:        2.0.0
 Release:        1
 Summary:        kunpeng sc
 License:        Apache-2.0
@@ -15,7 +15,7 @@ Requires:       openssl-devel zlib-devel kernel-devel
 Conflicts:      TEE_SDK TEE-devel_SDK
 
 %description
-Kunpeng sc for Secure Computing Application Development. Support os: openEuler 20.03 LTS SP1.
+Kunpeng sc for Secure Computing Application Development. Support os: openEuler 20.03 LTS.
 
 %prep
 BuildDir=%{_builddir}/%{name}-%{version}
@@ -73,9 +73,10 @@ cp ${BuildDir}/itrustee_sdk/libteec_adaptor.so.1 ${UsrLib64}
 cp -d ${BuildDir}/itrustee_client/dist/*.so ${UsrLib64}
 cp -d ${BuildDir}/itrustee_sdk/libteec_adaptor.so ${UsrLib64}
 
-# install teecd tlogcat
+# install teecd tlogcat tee_teleport
 cp ${BuildDir}/itrustee_client/dist/teecd ${UsrBin}/teecd
 cp ${BuildDir}/itrustee_client/dist/tlogcat ${UsrBin}/tlogcat
+cp ${BuildDir}/itrustee_client/dist/tee_teleport ${UsrBin}/tee_teleport
 
 # install driver
 cp -r ${BuildDir}/itrustee_tzdriver/ ${TzDriverDir}
@@ -89,6 +90,7 @@ cp -r ${BuildDir}/itrustee_tzdriver/ ${TzDriverDir}
 /lib64/libteec_adaptor.so
 %{_bindir}/teecd
 %{_bindir}/tlogcat
+%{_bindir}/tee_teleport
 /usr/local/%{name}
 
 /lib64/libboundscheck.so.1
@@ -114,6 +116,7 @@ rm -rf /usr/lib64/libteec.so
 rm -rf /usr/lib64/libteec_adaptor.so
 rm -rf %{_bindir}/teecd
 rm -rf %{_bindir}/tlogcat
+rm -rf %{_bindir}/tee_teleport
 
 count=$(ps -ef | grep teecd | grep -v "grep" | wc -l)
 if [ ${count} -ne 0 ]; then
@@ -151,12 +154,36 @@ if [ ${cnt4} -eq 0 ]; then
     /usr/bin/teecd &
 fi
 
+# insert tzdriver
+cnt5=$(lsmod | grep tzdriver | grep tee_update | wc -l)
+if [ ${cnt5} -eq 0 ]; then
+    cd /usr/local/%{name}/driver/tee_update
+    touch build_tzdriver.log
+    make -C libboundscheck >> build_tzdriver.log  2>&1
+    make >> build_tzdriver.log 2>&1
+    
+    # insmod should disable enforce
+    cnt6=$(getenforce | grep -i "Enforcing" | wc -l)
+    if [ ${cnt6} -ne 0 ]; then
+        sudo setenforce 0
+        sudo insmod tee_update.ko
+        sudo setenforce 1
+    else
+        sudo insmod tee_update.ko
+    fi
+fi
+
+cnt7=$(ps -ef|grep teecd | grep -v "grep" | wc -l)
+if [ ${cnt7} -eq 0 ]; then
+    /usr/bin/teecd &
+fi
+
 %preun
 %postun
 rm -rf /usr/local/%{name}
 
-cnt2=$(ps -ef|grep teecd | grep -v "grep" | wc -l)
-if [ ${cnt2} -ne 0 ]; then
+cnt8=$(ps -ef|grep teecd | grep -v "grep" | wc -l)
+if [ ${cnt8} -ne 0 ]; then
     kill -9 $(pidof teecd)
 fi
 
