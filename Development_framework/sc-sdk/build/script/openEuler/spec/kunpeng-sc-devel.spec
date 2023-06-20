@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 
 Name:           kunpeng-sc-devel
-Version:        1.3.0
+Version:        2.0.0
 Release:        1
 Summary:        kunpeng sc devel
 License:        Apache-2.0
@@ -11,7 +11,7 @@ Source2:        libboundscheck.tar.gz
 Source3:        demo.tar.gz
 
 BuildRequires:  gcc
-Requires:       openssl-devel zlib-devel kernel-devel kunpeng-sc = 1.3.0
+Requires:       openssl-devel zlib-devel kernel-devel kunpeng-sc = 2.0.0
 
 Conflicts: TEE_SDK TEE-devel_SDK
 

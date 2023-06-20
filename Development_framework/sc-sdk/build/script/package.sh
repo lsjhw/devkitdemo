@@ -22,7 +22,7 @@ PatchPath=${RootPath}/patch
 ScriptPath=${RootPath}/script
 SrcPath=${RootPath}/src
 OutputPath=${RootPath}/output
-PackageVersion="1.3.0"
+PackageVersion="2.0.0"
 
 # workdir
 DebBuild="/root/debbuild"
@@ -121,6 +121,10 @@ function get_src_code() {
     mkdir ${SrcPath}/demo
 
     cd ${SrcPath}
+
+    # copy tee runtime
+    cp -rf ../Python-2.6.15-tee-aarch64.tar.gz ./
+    cp -rf ../bisheng-jdk-8u372-tee-aarch64.tar.gz ./
     # download source code
     git clone https://gitee.com/openeuler/itrustee_sdk.git
     if [[ $? -ne 0 ]]; then
@@ -135,6 +139,9 @@ function get_src_code() {
         rm -rf ${SrcPath}
         exit 1
     fi
+    cd itrustee_client
+    git reset --hard b21a213637013232526165638b9e6be6370e6248
+    cd ..
 
     git clone https://gitee.com/openeuler/itrustee_tzdriver.git
     if [[ $? -ne 0 ]]; then
@@ -226,6 +233,8 @@ function copy_files() {
         cp ${SrcPath}/itrustee_client.tar.gz ${value}
         cp ${SrcPath}/itrustee_sdk.tar.gz ${value}
         cp ${SrcPath}/demo.tar.gz ${value}
+        cp -rf ${SrcPath}/bisheng-jdk-8u372-tee-aarch64.tar.gz ${value}
+        cp -rf ${SrcPath}/Python-3.6.15-tee-aarch64.tar.gz ${value}
     done
 }
 
